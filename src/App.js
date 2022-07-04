@@ -2,6 +2,7 @@ import "./style.css";
 import { useReducer } from "react";
 import DigitButton from "./DigitButton";
 import OperationButton from "./OperationButton";
+import History from "./History";
 
 export const ACTIONS = {
   ADD_DIGIT: "add-digit",
@@ -10,6 +11,8 @@ export const ACTIONS = {
   DELETE_DIGIT: "delete-digit",
   EVALUATE: "evaluate",
 };
+
+let history = [];
 
 function reducer(state, { type, payload }) {
   switch (type) {
@@ -22,10 +25,19 @@ function reducer(state, { type, payload }) {
         };
       }
       if (payload.digit === "0" && state.currentOperand === "0") return state;
-      if (payload.digit === "." && state.currentOperand == null ) return { ...state, currentOperand: payload.digit}
-      if (payload.digit === "."&& state.currentOperand && state.currentOperand.includes("."))
+      if (payload.digit === "." && state.currentOperand == null)
+        return { ...state, currentOperand: payload.digit };
+      if (
+        payload.digit === "." &&
+        state.currentOperand &&
+        state.currentOperand.includes(".")
+      )
         return state;
-      if (payload.digit !== "0" && payload.digit !== "." && state.currentOperand === "0")
+      if (
+        payload.digit !== "0" &&
+        payload.digit !== "." &&
+        state.currentOperand === "0"
+      )
         return { ...state, currentOperand: payload.digit };
       return {
         ...state,
@@ -114,6 +126,13 @@ function evaluate({ currentOperand, previousOperand, operation }) {
       calculation = prev / current;
       break;
   }
+  
+  let entry = `${prev} ${operation} ${current} = ${calculation}`
+  console.log(entry);
+  if (history.includes(entry)) {
+    return calculation.toString();
+  }
+  history.push(entry)
   return calculation.toString();
 }
 
@@ -123,9 +142,9 @@ const INTEGER_FORMATTER = new Intl.NumberFormat("en-us", {
 
 function formatOperand(operand) {
   if (operand == null) return;
-  const [integer, decimal] = operand.split('.');
+  const [integer, decimal] = operand.split(".");
   if (decimal == null) return INTEGER_FORMATTER.format(integer);
-  return `${INTEGER_FORMATTER.format(integer)}.${decimal}`
+  return `${INTEGER_FORMATTER.format(integer)}.${decimal}`;
 }
 
 export default function App() {
@@ -134,43 +153,46 @@ export default function App() {
     {}
   );
   return (
-    <div className="calculator">
-      <div className="display">
-        <div className="previous-display">
-          {formatOperand(previousOperand)} {operation}
+    <div className="calculator-container">
+      <div className="calculator">
+        <div className="display">
+          <div className="previous-display">
+            {formatOperand(previousOperand)} {operation}
+          </div>
+          <div className="current-display">{formatOperand(currentOperand)}</div>
         </div>
-        <div className="current-display">{formatOperand(currentOperand)}</div>
+        <button
+          className="span-two"
+          onClick={() => dispatch({ type: ACTIONS.CLEAR })}
+        >
+          AC
+        </button>
+        <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
+          DEL
+        </button>
+        <OperationButton operation="÷" dispatch={dispatch} />
+        <DigitButton digit="1" dispatch={dispatch} />
+        <DigitButton digit="2" dispatch={dispatch} />
+        <DigitButton digit="3" dispatch={dispatch} />
+        <OperationButton operation="*" dispatch={dispatch} />
+        <DigitButton digit="4" dispatch={dispatch} />
+        <DigitButton digit="5" dispatch={dispatch} />
+        <DigitButton digit="6" dispatch={dispatch} />
+        <OperationButton operation="+" dispatch={dispatch} />
+        <DigitButton digit="7" dispatch={dispatch} />
+        <DigitButton digit="8" dispatch={dispatch} />
+        <DigitButton digit="9" dispatch={dispatch} />
+        <OperationButton operation="-" dispatch={dispatch} />
+        <DigitButton digit={"."} dispatch={dispatch} />
+        <DigitButton digit="0" dispatch={dispatch} />
+        <button
+          className="span-two"
+          onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
+        >
+          =
+        </button>
       </div>
-      <button
-        className="span-two"
-        onClick={() => dispatch({ type: ACTIONS.CLEAR })}
-      >
-        AC
-      </button>
-      <button onClick={() => dispatch({ type: ACTIONS.DELETE_DIGIT })}>
-        DEL
-      </button>
-      <OperationButton operation="÷" dispatch={dispatch} />
-      <DigitButton digit="1" dispatch={dispatch} />
-      <DigitButton digit="2" dispatch={dispatch} />
-      <DigitButton digit="3" dispatch={dispatch} />
-      <OperationButton operation="*" dispatch={dispatch} />
-      <DigitButton digit="4" dispatch={dispatch} />
-      <DigitButton digit="5" dispatch={dispatch} />
-      <DigitButton digit="6" dispatch={dispatch} />
-      <OperationButton operation="+" dispatch={dispatch} />
-      <DigitButton digit="7" dispatch={dispatch} />
-      <DigitButton digit="8" dispatch={dispatch} />
-      <DigitButton digit="9" dispatch={dispatch} />
-      <OperationButton operation="-" dispatch={dispatch} />
-      <DigitButton digit={"."} dispatch={dispatch} />
-      <DigitButton digit="0" dispatch={dispatch} />
-      <button
-        className="span-two"
-        onClick={() => dispatch({ type: ACTIONS.EVALUATE })}
-      >
-        =
-      </button>
+      <History history={history} />
     </div>
   );
 }

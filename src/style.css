@@ -8,7 +8,10 @@ body {
   margin: 0;
   background-color: #2d3142;
 }
-
+.calculator-container {
+    display: flex;
+    justify-content: center;
+}
 .calculator {
     display: grid;
     margin-top: 2rem;
@@ -52,4 +55,32 @@ body {
 .display .current-display {
     color: white;
     font-size: 3rem;
+}
+.history-display {
+    color: white;
+    margin-top: 2rem;
+    border: 1px solid white;
+    width: 16rem;
+    text-align: center;
+    font-size: 1.5rem;
+    line-height: normal;
+}
+.history-display p {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.history-header {
+    background-color: black;
+    font-family: Arial, Helvetica, sans-serif;
+    padding: .5rem;
+}
+
+@media screen and (max-width: 400px) {
+    .calculator-container {
+        flex-direction: column;
+        align-items: center;
+    }
+    .history-display {
+        margin: 0;
+    }
 }
